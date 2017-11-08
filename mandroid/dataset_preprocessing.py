@@ -38,10 +38,16 @@ def load_dataset(dataset_path):
     :return: list of dictionaries containing files data.
     """
     data = []
+    hash = []
+    i=0
     for file in os.listdir(dataset_path):
+        if i >= 200:
+            break
         # load file data
         data.append(parse_file(dataset_path, file))
-    return data
+        hash.append(file)
+        i = i+1
+    return data, hash
 
 
 def parse_file(dataset_path, file_name):
@@ -63,14 +69,15 @@ def parse_file(dataset_path, file_name):
     :param file_name: name of the file in the format of SHA1 of the apk
     :return: dictionary of features.
     """
+    #list = []
     file_dict = {}
-
-    with open(dataset_path+file_name, "r") as f:
+    with open(dataset_path+"\\"+file_name, "r") as f:
         for line in f:
-            info = line.strip().split("::")
-            if info[0] == "feature":
+            file_dict[line.strip()] = True
+            #info = line.strip().split("::")
+            '''if info[0] == "feature":
                 if "req_hw" in file_dict:
-                    file_dict["req_hw"].append(info[1])
+                    file_dict[info[0]+"req_hw"+info[1]] = True;
                 else:
                     file_dict["req_hw"] = [info[1]]
             elif info[0] == "permission":
@@ -111,5 +118,12 @@ def parse_file(dataset_path, file_name):
                     file_dict["use_urls"].append(info[1])
                 else:
                     file_dict["use_urls"] = [info[1]]
-
+                    '''
     return file_dict
+
+data, hash = load_dataset("C:\\Users\\Valerio\\Downloads\\Machine Learning\\HW\\drebin\\feature_vectors")
+from sklearn.feature_extraction import DictVectorizer
+vec = DictVectorizer()
+
+print(vec.fit_transform(data))
+print(hash)
